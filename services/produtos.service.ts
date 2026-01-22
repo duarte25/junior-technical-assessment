@@ -2,6 +2,7 @@ import * as repository from '@/repositories/produtos.repository';
 import { produtos } from '@/generated/prisma/client';
 
 export const getAllProdutos = async (): Promise<produtos[]> => {
+    console.log("OLA")
   return repository.findAll();
 };
 
