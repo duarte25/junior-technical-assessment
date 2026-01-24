@@ -24,4 +24,31 @@ model produtos {
   marca          String?     @default("Generico") @db.VarChar(100)
   criado_em      DateTime?   @default(now()) @db.Timestamp(6)
   categorias     categorias? @relation(fields: [categoria_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  estoque               estoque?
+  estoque_movimentacoes estoque_movimentacoes[]
+}
+
+model estoque {
+  id            BigInt    @id @default(autoincrement())
+  produto_id    BigInt    @unique
+  quantidade    Int       @default(0)
+  atualizado_em DateTime? @default(now()) @db.Timestamp(6)
+
+  produtos produtos @relation(fields: [produto_id], references: [id], onDelete: Cascade)
+}
+
+enum tipo_movimentacao {
+  entrada
+  saida
+}
+
+model estoque_movimentacoes {
+  id         BigInt            @id @default(autoincrement())
+  produto_id BigInt
+  quantidade Int
+  tipo       tipo_movimentacao
+  criado_em  DateTime?         @default(now()) @db.Timestamp(6)
+
+  produtos produtos @relation(fields: [produto_id], references: [id], onDelete: Cascade)
 }
