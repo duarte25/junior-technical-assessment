@@ -41,8 +41,11 @@ export type CreateProdutoPayload = z.infer<typeof createProdutoSchema>;
 export type UpdateProdutoPayload = z.infer<typeof updateProdutoSchema>;
 
 // API Functions
-const fetchProdutos = async (): Promise<Produto[]> => {
-  const response = await fetch("/api/produtos");
+export const fetchProdutos = async (searchTerm = ""): Promise<Produto[]> => {
+  // Adiciona o query param ?q= se searchTerm existir
+  const url = `/api/produtos${searchTerm ? `?q=${encodeURIComponent(searchTerm)}` : ""}`;
+
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error("Failed to fetch products");
   }
@@ -102,10 +105,10 @@ const deleteProduto = async (id: string): Promise<void> => {
 };
 
 // React Query Hooks
-export const useProdutos = () => {
+export const useProdutos = (searchTerm = "") => {
   return useQuery<Produto[], Error>({
-    queryKey: ["produtos"],
-    queryFn: fetchProdutos,
+    queryKey: ["produtos", searchTerm],
+    queryFn: () => fetchProdutos(searchTerm),
   });
 };
 

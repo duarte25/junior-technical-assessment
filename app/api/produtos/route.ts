@@ -1,15 +1,18 @@
-import { NextResponse } from 'next/server';
 import * as service from '@/services/produtos.service';
+import { NextResponse } from 'next/server';
 
-export async function GET() {
-  const produtos = await service.getAllProdutos();
-  const produtosSerialized = produtos.map(produtos => {
-    return JSON.parse(
-      JSON.stringify(produtos, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-      )
-    );
-  });
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const term = searchParams.get('q') || undefined;
+
+  const produtos = await service.getAllProdutos(term);
+
+  const produtosSerialized = produtos.map(produto =>
+    JSON.parse(JSON.stringify(produto, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    ))
+  );
+
   return NextResponse.json(produtosSerialized);
 }
 

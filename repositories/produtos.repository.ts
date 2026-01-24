@@ -1,8 +1,16 @@
-import prisma from '@/lib/db';
 import { produtos } from '@/generated/prisma/client';
+import prisma from '@/lib/db';
 
-export const findAll = async (): Promise<produtos[]> => {
+export const findAll = async (term?: string): Promise<produtos[]> => {
   return prisma.produtos.findMany({
+    where: term
+      ? {
+        OR: [
+          { nome: { contains: term, mode: 'insensitive' } },
+          { sku: { contains: term, mode: 'insensitive' } },
+        ],
+      }
+      : undefined, // se não tiver termo, pega tudo
     include: { categorias: true },
   });
 };

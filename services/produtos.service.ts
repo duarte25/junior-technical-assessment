@@ -1,9 +1,8 @@
 import * as repository from '@/repositories/produtos.repository';
 import { produtos } from '@/generated/prisma/client';
 
-export const getAllProdutos = async (): Promise<produtos[]> => {
-    console.log("OLA")
-  return repository.findAll();
+export const getAllProdutos = async (term?: string): Promise<produtos[]> => {
+  return repository.findAll(term);
 };
 
 export const getProdutoById = async (id: bigint): Promise<produtos | null> => {
