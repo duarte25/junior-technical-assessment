@@ -29,7 +29,7 @@ export const create = async (data: Omit<produtos, 'id' | 'criado_em'>): Promise<
     data: {
       sku,
       nome,
-      categoria_id,
+      categoria_id: categoria_id,
       estoque_minimo,
       marca,
     },

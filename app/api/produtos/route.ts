@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const newProduto = await service.createProduto({
       sku,
       nome,
-      categoria_id: categoria_id ? BigInt(categoria_id) : null,
+      categoria_id: categoria_id,
       estoque_minimo,
       marca,
     });
