@@ -1,15 +1,18 @@
 import { NextResponse } from 'next/server';
 import * as service from '@/services/categorias.service';
 
-export async function GET() {
-  const categorias = await service.getAllCategorias();
-  const categoriasSerialized = categorias.map(categoria => {
-    return JSON.parse(
-      JSON.stringify(categoria, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-      )
-    );
-  });
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const term = searchParams.get('q') || undefined;
+
+  const categorias = await service.getAllCategorias(term);
+
+  const categoriasSerialized = categorias.map(categoria =>
+    JSON.parse(JSON.stringify(categoria, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    ))
+  );
+
   return NextResponse.json(categoriasSerialized);
 }
 

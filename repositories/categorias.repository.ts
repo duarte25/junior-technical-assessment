@@ -1,8 +1,17 @@
-import prisma from '@/lib/db';
 import { categorias } from '@/generated/prisma/client';
+import prisma from '@/lib/db';
 
-export const findAll = async (): Promise<categorias[]> => {
-  return prisma.categorias.findMany();
+export const findAll = async (term?: string): Promise<categorias[]> => {
+  return prisma.categorias.findMany({
+    where: term
+      ? {
+        OR: [
+          { nome: { contains: term, mode: 'insensitive' } },
+          { descricao: { contains: term, mode: 'insensitive' } },
+        ],
+      }
+      : undefined, 
+  });
 };
 
 export const findById = async (id: bigint): Promise<categorias | null> => {

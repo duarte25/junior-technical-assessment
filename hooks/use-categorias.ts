@@ -26,8 +26,11 @@ export type CreateCategoriaPayload = z.infer<typeof createCategoriaSchema>;
 export type UpdateCategoriaPayload = z.infer<typeof updateCategoriaSchema>;
 
 // API Functions
-const fetchCategories = async (): Promise<Categoria[]> => {
-  const response = await fetch("/api/categorias");
+const fetchCategories = async (searchTerm = ""): Promise<Categoria[]> => {
+
+  const url = `/api/categorias${searchTerm ? `?q=${encodeURIComponent(searchTerm)}` : ""}`;
+
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error("Failed to fetch categories");
   }
@@ -87,10 +90,10 @@ const deleteCategory = async (id: string): Promise<void> => {
 };
 
 // React Query Hooks
-export const useCategories = () => {
+export const useCategories = (searchTerm = "") => {
   return useQuery<Categoria[], Error>({
-    queryKey: ["categorias"],
-    queryFn: fetchCategories,
+    queryKey: ["categorias", searchTerm],
+    queryFn: () => fetchCategories(searchTerm),
   });
 };
 

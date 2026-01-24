@@ -1,17 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { DeleteCategoryDialog } from "@/components/categorias/categoria-delete-dialog";
+import { EditCategoryModal } from "@/components/categorias/categoria-edit-modal";
+import { AddCategoryModal } from "@/components/categorias/categoria-add-modal";
+import { categoriaColumns } from "@/components/categorias/categoria-columns";
 import { useCategories, Categoria } from "@/hooks/use-categorias";
 import { DataTable } from "@/components/custom/data-table";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { categoriaColumns } from "@/components/categorias/categoria-columns";
-import { AddCategoryModal } from "@/components/categorias/categoria-add-modal";
-import { EditCategoryModal } from "@/components/categorias/categoria-edit-modal";
-import { DeleteCategoryDialog } from "@/components/categorias/categoria-delete-dialog";
+import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
 
 export function CategoriasView() {
-  const { data: categories, isLoading, isError, error } = useCategories();
+  const [inputValue, setInputValue] = useState("");
+  const [debouncedTerm, setDebouncedTerm] = useState("");
+
+  const { data: categories, isLoading, isError, error } = useCategories(debouncedTerm);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -21,6 +24,16 @@ export function CategoriasView() {
   const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(
     null,
   );
+
+  useEffect(() => {
+    const termToSet = inputValue.length >= 3 ? inputValue : "";
+
+    const handler = setTimeout(() => {
+      setDebouncedTerm(termToSet);
+    }, 700);
+
+    return () => clearTimeout(handler);
+  }, [inputValue]);
 
   const handleEdit = (id: string) => {
     const categoryToEdit = categories?.find((cat) => cat.id === id);
@@ -51,8 +64,13 @@ export function CategoriasView() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}
-        searchComponent={
-          <Input placeholder="Buscar categorias..." className="max-w-sm" />
+         searchComponent={
+          <Input
+            placeholder="Buscar categorias..."
+            className="max-w-sm"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
         }
         actionButtons={[
           <Button key="new-category" onClick={() => setIsAddModalOpen(true)}>
