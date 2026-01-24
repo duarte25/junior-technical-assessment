@@ -21,6 +21,14 @@ export type Estoque = {
   quantidade: number;
 };
 
+export type EstoqueMovimentacoes = {
+  id: string;
+  criado_em: Date;
+  produto_id: string;
+  quantidade: number;
+  tipo: string;
+};
+
 export type CreateEstoquePayload = z.infer<typeof createEstoqueSchema>;
 
 export type UpdateEstoquePayload = z.infer<typeof updateEstoqueSchema>;
@@ -38,57 +46,13 @@ const fetchEstoque = async (searchTerm = ""): Promise<Estoque[]> => {
   return response.json();
 };
 
-// const fetchEstoqueById = async (id: string): Promise<Estoque> => {
-//   const response = await fetch(`/api/estoque/${id}`);
-//   if (!response.ok) {
-//     throw new Error(`Failed to fetch category with ID ${id}`);
-//   }
-//   return response.json();
-// };
-
-// const createCategory = async (
-//   payload: CreateCategoriaPayload
-// ): Promise<Categoria> => {
-//   const response = await fetch("/api/categorias", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(payload),
-//   });
-//   if (!response.ok) {
-//     const errorData = await response.json();
-//     throw new Error(errorData.message || "Failed to create category");
-//   }
-//   return response.json();
-// };
-
-// const updateCategory = async (
-//   payload: UpdateCategoriaPayload
-// ): Promise<Categoria> => {
-//   const response = await fetch(`/api/categorias/${payload.id}`, {
-//     method: "PUT",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(payload),
-//   });
-//   if (!response.ok) {
-//     const errorData = await response.json();
-//     throw new Error(errorData.message || "Failed to update category");
-//   }
-//   return response.json();
-// };
-
-// const deleteCategory = async (id: string): Promise<void> => {
-//   const response = await fetch(`/api/categorias/${id}`, {
-//     method: "DELETE",
-//   });
-//   if (!response.ok) {
-//     const errorData = await response.json();
-//     throw new Error(errorData.message || "Failed to delete category");
-//   }
-// };
+const fetchEstoqueByIdMovimentacao = async (id: string): Promise<EstoqueMovimentacoes[]> => {
+  const response = await fetch(`/api/estoque/movimentacoes/${id}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch category with ID ${id}`);
+  }
+  return response.json();
+};
 
 // React Query Hooks
 export const useEstoque = (searchTerm = "") => {
@@ -98,13 +62,13 @@ export const useEstoque = (searchTerm = "") => {
   });
 };
 
-// export const useCategory = (id: string) => {
-//   return useQuery<Categoria, Error>({
-//     queryKey: ["categorias", id],
-//     queryFn: () => fetchCategoryById(id),
-//     enabled: !!id, // Only run the query if id is truthy
-//   });
-// };
+export const useEstoqueMovimentacoes = (id: string) => {
+  return useQuery<EstoqueMovimentacoes[], Error>({
+    queryKey: ["estoqueMovimentacoes", id],
+    queryFn: () => fetchEstoqueByIdMovimentacao(id),
+    enabled: !!id, 
+  });
+};
 
 // export const useCreateCategory = () => {
 //   const queryClient = useQueryClient();

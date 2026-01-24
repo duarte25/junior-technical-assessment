@@ -15,11 +15,24 @@ export const findAll = async (term?: string): Promise<estoque[]> => {
   });
 };
 
-// export const findById = async (id: bigint): Promise<categorias | null> => {
-//   return prisma.categorias.findUnique({
-//     where: { id },
-//   });
-// };
+export const getEstoqueByIdMovimentacao = async (id: bigint): Promise<estoque | null> => {
+  return prisma.estoque_movimentacoes.findMany({
+    where: {
+      produto_id: id
+    },
+    include: {
+      produtos: {
+        select: {
+          nome: true,
+          sku: true
+        }
+      }
+    },
+    orderBy: {
+      criado_em: 'desc'
+    }
+  });
+};
 
 // export const create = async (data: Omit<categorias, 'id' | 'criado_em'>): Promise<categorias> => {
 //   return prisma.categorias.create({

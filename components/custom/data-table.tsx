@@ -25,6 +25,7 @@ interface DataTableProps<TData extends { id: string }, TValue> {
   data: TData[];
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
+  onView?: (id: string) => void;
   isLoading?: boolean;
   filterComponent?: React.ReactNode;
   searchComponent?: React.ReactNode;
@@ -40,6 +41,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   data,
   onEdit,
   onDelete,
+  onView,
   isLoading = false,
   filterComponent,
   searchComponent,
@@ -113,8 +115,17 @@ export function DataTable<TData extends { id: string }, TValue>({
                       )}
                     </TableCell>
                   ))}
-                  {(onEdit || onDelete) && (
+                  {(onEdit || onDelete || onView) && (
                     <TableCell className="text-right">
+                      {onView && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => onView(row.original.id)} // Assuming id field exists
+                          className="mr-2"
+                        >
+                          View
+                        </Button>
+                      )}
                       {onEdit && (
                         <Button
                           variant="ghost"
