@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:17-alpine
-    container_name: nextjs_postgres_db_v17
+    container_name: postgres_db_v17
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -13,6 +13,21 @@ services:
     volumes:
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data_v17:/var/lib/postgresql/data
+
+  app:
+    container_name: nextjs_app
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/postgres
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
 
 volumes:
   postgres_data_v17:
