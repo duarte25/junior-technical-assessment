@@ -1,5 +1,6 @@
 import { EstoqueMovimentacoes } from '@/hooks/use-estoque';
 import * as service from '@/services/estoque.service';
+import { BusinessError } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 
 interface Params {
@@ -23,8 +24,12 @@ export async function GET(
 
     return NextResponse.json(estoqueSerialized);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+
+    if (error instanceof BusinessError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
+
+    return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
   }
 }
 
@@ -45,9 +50,10 @@ export async function PUT(
 
     return NextResponse.json(updatedEstoqueSerialized);
   } catch (error) {
-    if (error instanceof Error && error.message.includes('not found')) {
-      return NextResponse.json({ error: 'Estoque não encontrada para atualização' }, { status: 404 });
+    if (error instanceof BusinessError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
     }
-    return NextResponse.json({ error: 'Falha ao atualizar estoque' }, { status: 500 });
+
+    return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
   }
 }

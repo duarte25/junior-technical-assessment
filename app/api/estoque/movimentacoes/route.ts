@@ -1,5 +1,5 @@
-import { BusinessError } from '@/lib/errors';
 import * as service from '@/services/estoque.service';
+import { BusinessError } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     return NextResponse.json(newMovimentacaoEstoqueSerialized, { status: 201 });
   } catch (error) {
     if (error instanceof BusinessError) {
-      return NextResponse.json({ message: error.message }, { status: 400 });
+      return NextResponse.json({ message: error.message }, { status: error.status });
     }
 
     return NextResponse.json({ message: 'Erro interno no servidor' }, { status: 500 });

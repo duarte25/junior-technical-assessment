@@ -1,6 +1,6 @@
 import { estoque, estoque_movimentacoes } from '@/generated/prisma/client';
-import { BusinessError } from '@/lib/errors';
 import * as repository from '@/repositories/estoque.repository';
+import { BusinessError } from '@/lib/errors';
 
 export const getAllEstoque = async (term?: string): Promise<estoque[]> => {
   return repository.findAll(term);
@@ -14,7 +14,7 @@ export const createMovimentacaoEstoque = async (data: Omit<estoque_movimentacoes
   if (data.tipo === 'saida') {
     const estoqueAtual = await repository.findEstoqueByProdutoId(data.produto_id);
     if (!estoqueAtual || estoqueAtual.quantidade < data.quantidade) {
-      throw new BusinessError(`Saldo insuficiente! Estoque atual: ${estoqueAtual?.quantidade || 0}`);
+      throw new BusinessError(`Saldo insuficiente! Estoque atual: ${estoqueAtual?.quantidade || 0}`, 400);
     }
   }
   return repository.createMovimentacao(data as estoque_movimentacoes);
@@ -23,7 +23,7 @@ export const createMovimentacaoEstoque = async (data: Omit<estoque_movimentacoes
 export const updateEstoqueMovimentacao = async (id: bigint, data: Partial<Omit<estoque_movimentacoes, 'id' | 'criado_em'>>): Promise<estoque_movimentacoes> => {
   // Pegar a movimentação atual para saber o impacto que ela já causou
   const movAntiga = await repository.findMovimentacaoById(id);
-  if (!movAntiga) throw new Error("Movimentação não encontrada");
+  if (!movAntiga) throw new BusinessError("Movimentação não encontrada", 404);
 
   // Pegar o estoque real do produto agora
   const estoqueAtual = await repository.findEstoqueByProdutoId(movAntiga.produto_id);
@@ -39,7 +39,7 @@ export const updateEstoqueMovimentacao = async (id: bigint, data: Partial<Omit<e
 
   // Validar Saldo Atual + Estorno + Novo Impacto não pode ser < 0
   if (saldoAgora + estorno + novoImpacto < 0) {
-    throw new Error("Esta alteração deixaria o estoque negativo. Operação cancelada.");
+    throw new BusinessError("Esta alteração deixaria o estoque negativo. Operação cancelada.", 400);
   }
 
   return repository.updateEstoqueMovimentacao(id, data);
