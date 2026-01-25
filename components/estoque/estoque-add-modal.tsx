@@ -51,9 +51,9 @@ export function AddEstoqueModal({
         toast.success("Movimentação registrada com sucesso!");
         onClose();
       },
-      // onError: (error) => {
-      //   toast.error(`Erro: ${error.message}`);
-      // },
+      onError: (error) => {
+        toast.error(`Erro ao criar movimentação: ${error.message}`);
+      },
     });
   };
 

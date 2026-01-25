@@ -1,13 +1,14 @@
 "use client";
 
 import { estoqueMovimentacoesColumns } from "./estoque-movimentacoes-columns";
-import { useEstoqueMovimentacoes } from "@/hooks/use-estoque";
+import { EstoqueMovimentacoes, useEstoqueMovimentacoes } from "@/hooks/use-estoque";
 import { BaseModal } from "@/components/custom/base-modal";
+import { EditEstoqueModal } from "./estoque-edit-modal";
+import { AddEstoqueModal } from "./estoque-add-modal";
 import { estoque } from "@/generated/prisma/client";
 import { DataTable } from "../custom/data-table";
 import { Button } from "../ui/button";
 import { useState } from "react";
-import { AddEstoqueModal } from "./estoque-add-modal";
 
 export function ViewEstoqueModal({
   isOpen,
@@ -21,6 +22,18 @@ export function ViewEstoqueModal({
 
   const { data: estoqueMovimentacoes, isLoading, isError, error } = useEstoqueMovimentacoes(stock?.produto_id ?? "");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedEstoqueMovi, setSelectedEstoqueMovi] = useState<EstoqueMovimentacoes | null>(
+    null,
+  );
+
+  const handleEdit = (id: string) => {
+    const stockToEdit = estoqueMovimentacoes?.find((cat) => cat.id === id);
+    if (stockToEdit) {
+      setSelectedEstoqueMovi(stockToEdit);
+      setIsEditModalOpen(true);
+    }
+  };
 
   if (isError) {
     return (
@@ -42,16 +55,8 @@ export function ViewEstoqueModal({
         <DataTable
           columns={estoqueMovimentacoesColumns}
           data={estoqueMovimentacoes || []}
-          // onView={handleVie}
+          onEdit={handleEdit}
           isLoading={isLoading}
-          // searchComponent={
-          //   <Input
-          //     placeholder="Buscar no estoque..."
-          //     className="max-w-sm"
-          //     value={inputValue}
-          //     onChange={(e) => setInputValue(e.target.value)}
-          //   />
-          // }
           actionButtons={[
             <Button key="new-product" onClick={() => setIsAddModalOpen(true)}>
               Nova movimentação
@@ -64,6 +69,11 @@ export function ViewEstoqueModal({
           onClose={() => setIsAddModalOpen(false)}
           produtoId={stock?.produto_id ?? ""}
           nomeProduto={stock?.produtos?.nome ?? ""}
+        />
+        <EditEstoqueModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          stock={selectedEstoqueMovi}
         />
       </>
     </BaseModal>

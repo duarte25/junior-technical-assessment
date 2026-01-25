@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 
 interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -86,9 +87,9 @@ export function DataTable<TData extends { id: string }, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                     </TableHead>
                   );
                 })}
@@ -123,7 +124,7 @@ export function DataTable<TData extends { id: string }, TValue>({
                           onClick={() => onView(row.original.id)} // Assuming id field exists
                           className="mr-2"
                         >
-                          View
+                          <Eye />
                         </Button>
                       )}
                       {onEdit && (
@@ -132,7 +133,7 @@ export function DataTable<TData extends { id: string }, TValue>({
                           onClick={() => onEdit(row.original.id)} // Assuming id field exists
                           className="mr-2"
                         >
-                          Edit
+                          <Pencil />
                         </Button>
                       )}
                       {onDelete && (
@@ -140,7 +141,7 @@ export function DataTable<TData extends { id: string }, TValue>({
                           variant="ghost"
                           onClick={() => onDelete(row.original.id)} // Assuming id field exists
                         >
-                          Delete
+                          <Trash2 />
                         </Button>
                       )}
                     </TableCell>

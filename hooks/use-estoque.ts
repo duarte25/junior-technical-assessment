@@ -4,14 +4,15 @@ import * as z from "zod";
 // Zod Schemas
 export const createEstoqueMovimentacaoSchema = z.object({
   produto_id: z.string(),
-  quantidade: z.number(),
+  quantidade: z.coerce.number(),
   tipo: z.string(),
 });
 
 export const updateEstoqueSchema = z.object({
   id: z.string(),
-  nome: z.string().min(1, "Nome é obrigatório").optional(),
-  descricao: z.string().optional(),
+  produto_id: z.string(),
+  quantidade: z.coerce.number(),
+  tipo: z.string(),
 });
 
 // Types
@@ -98,23 +99,30 @@ export const useCreateMovimentacao = () => {
   });
 };
 
-// export const useUpdateCategory = () => {
-//   const queryClient = useQueryClient();
-//   return useMutation<Categoria, Error, UpdateCategoriaPayload>({
-//     mutationFn: updateCategory,
-//     onSuccess: (data) => {
-//       queryClient.invalidateQueries({ queryKey: ["categorias"] });
-//       queryClient.invalidateQueries({ queryKey: ["categorias", data.id] });
-//     },
-//   });
-// };
+const updateStock = async (
+  payload: UpdateEstoquePayload
+): Promise<EstoqueMovimentacoes> => {
+  const response = await fetch(`/api/estoque/movimentacoes/${payload.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to update stock");
+  }
+  return response.json();
+};
 
-// export const useDeleteCategory = () => {
-//   const queryClient = useQueryClient();
-//   return useMutation<void, Error, string>({
-//     mutationFn: deleteCategory,
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ["categorias"] });
-//     },
-//   });
-// };
+export const useUpdateStock = () => {
+  const queryClient = useQueryClient();
+  return useMutation<EstoqueMovimentacoes, Error, UpdateEstoquePayload>({
+    mutationFn: updateStock,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["estoqueMovimentacoes"] });
+      queryClient.invalidateQueries({ queryKey: ["estoqueMovimentacoes", data.id] });
+    },
+  });
+};
