@@ -23,18 +23,11 @@ export const findById = async (id: bigint): Promise<produtos | null> => {
 };
 
 export const create = async (data: Omit<produtos, 'id' | 'criado_em'>): Promise<produtos> => {
-  const { sku, nome, categoria_id, estoque_minimo, marca } = data;
 
   // $transaction para garantir que o estoque seja criado junto com o produto
   return prisma.$transaction(async (tx) => {
     const novoProduto = await tx.produtos.create({
-      data: {
-        sku,
-        nome,
-        categoria_id,
-        estoque_minimo,
-        marca,
-      },
+      data: data,
     });
 
     await tx.estoque.create({
@@ -58,5 +51,11 @@ export const update = async (id: bigint, data: Partial<Omit<produtos, 'id' | 'cr
 export const remove = async (id: bigint): Promise<produtos> => {
   return prisma.produtos.delete({
     where: { id },
+  });
+};
+
+export const findBySku = async (sku: string): Promise<produtos | null> => {
+  return prisma.produtos.findUnique({
+    where: { sku },
   });
 };

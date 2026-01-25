@@ -13,5 +13,5 @@ export async function GET(request: Request) {
     ))
   );
 
-  return NextResponse.json(estoqueSerialized);
+  return NextResponse.json(estoqueSerialized, { status: 200 });
 }

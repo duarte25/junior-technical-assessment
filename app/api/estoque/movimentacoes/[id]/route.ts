@@ -22,7 +22,7 @@ export async function GET(
       produto_id: item.produto_id.toString(),
     }));
 
-    return NextResponse.json(estoqueSerialized);
+    return NextResponse.json(estoqueSerialized, { status: 200 });
   } catch (error) {
 
     if (error instanceof BusinessError) {
@@ -48,7 +48,7 @@ export async function PUT(
       produto_id: updatedEstoque.produto_id.toString(),
     };
 
-    return NextResponse.json(updatedEstoqueSerialized);
+    return NextResponse.json(updatedEstoqueSerialized, { status: 200 });
   } catch (error) {
     if (error instanceof BusinessError) {
       return NextResponse.json({ message: error.message }, { status: error.status });

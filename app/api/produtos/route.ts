@@ -1,4 +1,5 @@
 import * as service from '@/services/produtos.service';
+import { BusinessError } from '@/lib/errors';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
     ))
   );
 
-  return NextResponse.json(produtosSerialized);
+  return NextResponse.json(produtosSerialized, { status: 200 });
 }
 
 export async function POST(request: Request) {
@@ -39,7 +40,10 @@ export async function POST(request: Request) {
     );
     return NextResponse.json(newProdutoSerialized, { status: 201 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Falha ao criar produto' }, { status: 500 });
+
+    if (error instanceof BusinessError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
   }
 }
