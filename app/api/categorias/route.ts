@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import * as service from '@/services/categorias.service';
+import { BusinessError } from '@/lib/errors';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
     ))
   );
 
-  return NextResponse.json(categoriasSerialized);
+  return NextResponse.json(categoriasSerialized, { status: 200 });
 }
 
 export async function POST(request: Request) {
@@ -30,7 +31,9 @@ export async function POST(request: Request) {
     };
     return NextResponse.json(newCategoriaSerialized, { status: 201 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Falha ao criar categoria' }, { status: 500 });
+    if (error instanceof BusinessError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
   }
 }

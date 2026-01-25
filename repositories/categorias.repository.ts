@@ -10,7 +10,7 @@ export const findAll = async (term?: string): Promise<categorias[]> => {
           { descricao: { contains: term, mode: 'insensitive' } },
         ],
       }
-      : undefined, 
+      : undefined,
   });
 };
 
@@ -37,4 +37,25 @@ export const remove = async (id: bigint): Promise<categorias> => {
   return prisma.categorias.delete({
     where: { id },
   });
+};
+
+export const findByNome = async (nome: string): Promise<categorias | null> => {
+  return prisma.categorias.findFirst({
+    where: {
+      nome: {
+        equals: nome,
+        mode: 'insensitive',
+      },
+    },
+  });
+};
+
+export const hasRelatedProducts = async (id: bigint): Promise<boolean> => {
+  const count = await prisma.produtos.count({
+    where: {
+      categoria_id: id,
+    },
+  });
+
+  return count > 0;
 };

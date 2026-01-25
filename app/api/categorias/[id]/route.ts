@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import * as service from '@/services/categorias.service';
+import { BusinessError } from '@/lib/errors';
 
 interface Params {
   params: Promise<{ id: string; }>;
@@ -19,10 +20,13 @@ export async function GET(
       ...categoria,
       id: categoria.id.toString()
     };
-    return NextResponse.json(categoriaSerialized);
+    return NextResponse.json(categoriaSerialized, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
+    if (error instanceof BusinessError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
+
+    return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
   }
 }
 
@@ -41,10 +45,11 @@ export async function PUT(
     };
     return NextResponse.json(updatedCategoriaSerialized);
   } catch (error) {
-    if (error instanceof Error && error.message.includes('not found')) {
-      return NextResponse.json({ error: 'Categoria não encontrada para atualização' }, { status: 404 });
+    if (error instanceof BusinessError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
     }
-    return NextResponse.json({ error: 'Falha ao atualizar categoria' }, { status: 500 });
+
+    return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
   }
 }
 
@@ -57,8 +62,8 @@ export async function DELETE(
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     if (error instanceof Error && error.message.includes('not found')) {
-      return NextResponse.json({ error: 'Categoria não encontrada para exclusão' }, { status: 404 });
+      return NextResponse.json({ error: 'Produto não encontrado para exclusão' }, { status: 404 });
     }
-    return NextResponse.json({ error: 'Falha ao excluir categoria' }, { status: 500 });
+    return NextResponse.json({ error: 'Falha ao excluir produto' }, { status: 500 })
   }
 }
