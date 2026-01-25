@@ -57,3 +57,18 @@ export async function PUT(
     return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: Request, { params }: Params
+) {
+  try {
+    const id = BigInt((await params).id);
+    await service.deleteMovimentacao(id);
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+       if (error instanceof BusinessError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: 'Falha ao excluir movimentação' }, { status: 500 });
+  }
+}

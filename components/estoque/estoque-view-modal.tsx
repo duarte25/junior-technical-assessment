@@ -1,7 +1,8 @@
 "use client";
 
-import { estoqueMovimentacoesColumns } from "./estoque-movimentacoes-columns";
 import { EstoqueMovimentacoes, useEstoqueMovimentacoes } from "@/hooks/use-estoque";
+import { estoqueMovimentacoesColumns } from "./estoque-movimentacoes-columns";
+import { DeleteStocktDialog } from "./estoque-delete-dialog";
 import { BaseModal } from "@/components/custom/base-modal";
 import { EditEstoqueModal } from "./estoque-edit-modal";
 import { AddEstoqueModal } from "./estoque-add-modal";
@@ -23,9 +24,14 @@ export function ViewEstoqueModal({
   const { data: estoqueMovimentacoes, isLoading, isError, error } = useEstoqueMovimentacoes(stock?.produto_id ?? "");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedEstoqueMovi, setSelectedEstoqueMovi] = useState<EstoqueMovimentacoes | null>(
     null,
   );
+  const [stockIdToDelete, setStockIdToDelete] = useState<string | null>(
+    null,
+  );
+
 
   const handleEdit = (id: string) => {
     const stockToEdit = estoqueMovimentacoes?.find((cat) => cat.id === id);
@@ -34,6 +40,12 @@ export function ViewEstoqueModal({
       setIsEditModalOpen(true);
     }
   };
+
+  const handleDelete = (id: string) => {
+    setStockIdToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
 
   if (isError) {
     return (
@@ -56,6 +68,7 @@ export function ViewEstoqueModal({
           columns={estoqueMovimentacoesColumns}
           data={estoqueMovimentacoes || []}
           onEdit={handleEdit}
+          onDelete={handleDelete}
           isLoading={isLoading}
           actionButtons={[
             <Button key="new-product" onClick={() => setIsAddModalOpen(true)}>
@@ -74,6 +87,11 @@ export function ViewEstoqueModal({
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           stock={selectedEstoqueMovi}
+        />
+        <DeleteStocktDialog
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          productId={stockIdToDelete}
         />
       </>
     </BaseModal>

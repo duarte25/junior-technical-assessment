@@ -31,7 +31,7 @@ export const updateEstoqueMovimentacao = async (id: bigint, data: Partial<Omit<e
 
   // Simular o estorno da movimentação antiga
   const estorno = movAntiga.tipo === 'entrada' ? -movAntiga.quantidade : movAntiga.quantidade;
-  
+
   // Calcular o novo impacto
   const novoTipo = data.tipo || movAntiga.tipo;
   const novaQtd = data.quantidade !== undefined ? data.quantidade : movAntiga.quantidade;
@@ -43,4 +43,24 @@ export const updateEstoqueMovimentacao = async (id: bigint, data: Partial<Omit<e
   }
 
   return repository.updateEstoqueMovimentacao(id, data);
+};
+
+export const deleteMovimentacao = async (id: bigint): Promise<estoque_movimentacoes> => {
+
+  const mov = await repository.findMovimentacaoById(id);
+  if (!mov) throw new BusinessError("Movimentação não encontrada", 404);
+
+  if (mov.tipo === 'entrada') {
+    const estoqueAtual = await repository.findEstoqueByProdutoId(mov.produto_id);
+    const saldoResultante = (estoqueAtual?.quantidade || 0) - mov.quantidade;
+
+    if (saldoResultante < 0) {
+      throw new BusinessError(
+        `Não é possível excluir esta entrada. O saldo atual (${estoqueAtual?.quantidade || 0}) ficaria negativo após o estorno.`,
+        400
+      );
+    }
+  }
+
+  return repository.removeMovimentacao(id);
 };

@@ -111,3 +111,29 @@ export const findMovimentacaoById = async (id: bigint) => {
     where: { id }
   });
 };
+
+export const removeMovimentacao = async (id: bigint): Promise<estoque_movimentacoes> => {
+  return prisma.$transaction(async (tx) => {
+    const mov = await tx.estoque_movimentacoes.findUnique({
+      where: { id },
+    });
+
+    if (!mov) throw new Error("Movimentação não encontrada no banco");
+
+    // Se era entrada (+), o estorno é negativo (-)
+    // Se era saída (-), o estorno é positivo (+)
+    const estorno = mov.tipo === 'entrada' ? -mov.quantidade : mov.quantidade;
+
+    await tx.estoque.update({
+      where: { produto_id: mov.produto_id },
+      data: {
+        quantidade: { increment: estorno }
+      }
+    });
+
+    // Agora sim podemos deletar a movimentação
+    return tx.estoque_movimentacoes.delete({
+      where: { id }
+    });
+  });
+};

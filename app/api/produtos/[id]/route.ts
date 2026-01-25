@@ -50,7 +50,7 @@ export async function PUT(request: Request, { params }: Params) {
     if (error instanceof BusinessError) {
       return NextResponse.json({ message: error.message }, { status: error.status });
     }
-   
+
     return NextResponse.json({ error: "Erro interno no servidor" }, { status: 500 });
   }
 }
@@ -63,9 +63,10 @@ export async function DELETE(
     await service.deleteProduto(id);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    if (error instanceof Error && error.message.includes('not found')) {
-      return NextResponse.json({ error: 'Produto não encontrado para exclusão' }, { status: 404 });
+    if (error instanceof BusinessError) {
+      return NextResponse.json({ message: error.message }, { status: error.status });
     }
+
     return NextResponse.json({ error: 'Falha ao excluir produto' }, { status: 500 });
   }
 }

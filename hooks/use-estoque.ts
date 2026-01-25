@@ -94,7 +94,8 @@ export const useCreateMovimentacao = () => {
   return useMutation<EstoqueMovimentacoes, Error, CreateEstoqueMovimentacaoPayload>({
     mutationFn: createMovimentacao,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["estoquesMovimentacao"] });
+      queryClient.invalidateQueries({ queryKey: ["estoqueMovimentacoes"] });
+      queryClient.invalidateQueries({ queryKey: ["estoque"] });
     },
   });
 };
@@ -123,6 +124,27 @@ export const useUpdateStock = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["estoqueMovimentacoes"] });
       queryClient.invalidateQueries({ queryKey: ["estoqueMovimentacoes", data.id] });
+      queryClient.invalidateQueries({ queryKey: ["estoque"] });
+    },
+  });
+};
+const deleteMovimentacao = async (id: string): Promise<void> => {
+  const response = await fetch(`/api/estoque/movimentacoes/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to delete stock");
+  }
+};
+
+export const useDeleteMovimentacao = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: deleteMovimentacao,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["estoqueMovimentacoes"] });
+      queryClient.invalidateQueries({ queryKey: ["estoque"] });
     },
   });
 };
