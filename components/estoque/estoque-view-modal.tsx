@@ -5,6 +5,9 @@ import { useEstoqueMovimentacoes } from "@/hooks/use-estoque";
 import { BaseModal } from "@/components/custom/base-modal";
 import { estoque } from "@/generated/prisma/client";
 import { DataTable } from "../custom/data-table";
+import { Button } from "../ui/button";
+import { useState } from "react";
+import { AddEstoqueModal } from "./estoque-add-modal";
 
 export function ViewEstoqueModal({
   isOpen,
@@ -17,6 +20,7 @@ export function ViewEstoqueModal({
 }) {
 
   const { data: estoqueMovimentacoes, isLoading, isError, error } = useEstoqueMovimentacoes(stock?.produto_id ?? "");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   if (isError) {
     return (
@@ -40,21 +44,27 @@ export function ViewEstoqueModal({
           data={estoqueMovimentacoes || []}
           // onView={handleVie}
           isLoading={isLoading}
-        // searchComponent={
-        //   <Input
-        //     placeholder="Buscar no estoque..."
-        //     className="max-w-sm"
-        //     value={inputValue}
-        //     onChange={(e) => setInputValue(e.target.value)}
-        //   />
-        // }
+          // searchComponent={
+          //   <Input
+          //     placeholder="Buscar no estoque..."
+          //     className="max-w-sm"
+          //     value={inputValue}
+          //     onChange={(e) => setInputValue(e.target.value)}
+          //   />
+          // }
+          actionButtons={[
+            <Button key="new-product" onClick={() => setIsAddModalOpen(true)}>
+              Nova movimentação
+            </Button>,
+          ]}
         />
 
-        {/* <ViewEstoqueModal
-        isOpen={isViewEstoqueModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
-        stock={selectedEstoque}
-      /> */}
+        <AddEstoqueModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          produtoId={stock?.produto_id ?? ""}
+          nomeProduto={stock?.produtos?.nome ?? ""}
+        />
       </>
     </BaseModal>
   );

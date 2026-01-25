@@ -25,14 +25,26 @@ export const findById = async (id: bigint): Promise<produtos | null> => {
 export const create = async (data: Omit<produtos, 'id' | 'criado_em'>): Promise<produtos> => {
   const { sku, nome, categoria_id, estoque_minimo, marca } = data;
 
-  return prisma.produtos.create({
-    data: {
-      sku,
-      nome,
-      categoria_id: categoria_id,
-      estoque_minimo,
-      marca,
-    },
+  // $transaction para garantir que o estoque seja criado junto com o produto
+  return prisma.$transaction(async (tx) => {
+    const novoProduto = await tx.produtos.create({
+      data: {
+        sku,
+        nome,
+        categoria_id,
+        estoque_minimo,
+        marca,
+      },
+    });
+
+    await tx.estoque.create({
+      data: {
+        produto_id: novoProduto.id,
+        quantidade: 0,
+      },
+    });
+
+    return novoProduto;
   });
 };
 

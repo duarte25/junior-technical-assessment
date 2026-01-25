@@ -15,15 +15,12 @@ export async function GET(
     const id = BigInt((await params).id);
     const estoque = await service.getEstoqueByIdMovimentacao(id);
 
-    if (!estoque || estoque.length === 0) {
-      return NextResponse.json({ error: 'Movimentações não encontradas' }, { status: 404 });
-    }
-
     const estoqueSerialized = estoque.map((item: EstoqueMovimentacoes) => ({
       ...item,
-      id: Number(item.id),
-      produto_id: Number(item.produto_id),
+      id: item.id.toString(),
+      produto_id: item.produto_id.toString(),
     }));
+
     return NextResponse.json(estoqueSerialized);
   } catch (error) {
     console.error(error);

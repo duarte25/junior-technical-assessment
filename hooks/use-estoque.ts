@@ -2,9 +2,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as z from "zod";
 
 // Zod Schemas
-export const createEstoqueSchema = z.object({
-  nome: z.string().min(1, "Nome é obrigatório"),
-  descricao: z.string().optional(),
+export const createEstoqueMovimentacaoSchema = z.object({
+  produto_id: z.string(),
+  quantidade: z.number(),
+  tipo: z.string(),
 });
 
 export const updateEstoqueSchema = z.object({
@@ -29,7 +30,7 @@ export type EstoqueMovimentacoes = {
   tipo: string;
 };
 
-export type CreateEstoquePayload = z.infer<typeof createEstoqueSchema>;
+export type CreateEstoqueMovimentacaoPayload = z.infer<typeof createEstoqueMovimentacaoSchema>;
 
 export type UpdateEstoquePayload = z.infer<typeof updateEstoqueSchema>;
 
@@ -39,7 +40,7 @@ const fetchEstoque = async (searchTerm = ""): Promise<Estoque[]> => {
   const url = `/api/estoque${searchTerm ? `?q=${encodeURIComponent(searchTerm)}` : ""}`;
 
   const response = await fetch(url);
-  
+
   if (!response.ok) {
     throw new Error("Failed to fetch categories");
   }
@@ -66,19 +67,36 @@ export const useEstoqueMovimentacoes = (id: string) => {
   return useQuery<EstoqueMovimentacoes[], Error>({
     queryKey: ["estoqueMovimentacoes", id],
     queryFn: () => fetchEstoqueByIdMovimentacao(id),
-    enabled: !!id, 
+    enabled: !!id,
   });
 };
 
-// export const useCreateCategory = () => {
-//   const queryClient = useQueryClient();
-//   return useMutation<Categoria, Error, CreateCategoriaPayload>({
-//     mutationFn: createCategory,
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ["categorias"] });
-//     },
-//   });
-// };
+const createMovimentacao = async (
+  payload: CreateEstoqueMovimentacaoPayload
+): Promise<EstoqueMovimentacoes> => {
+  const response = await fetch("/api/estoque/movimentacoes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to create category");
+  }
+  return response.json();
+};
+
+export const useCreateMovimentacao = () => {
+  const queryClient = useQueryClient();
+  return useMutation<EstoqueMovimentacoes, Error, CreateEstoqueMovimentacaoPayload>({
+    mutationFn: createMovimentacao,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["estoquesMovimentacao"] });
+    },
+  });
+};
 
 // export const useUpdateCategory = () => {
 //   const queryClient = useQueryClient();
