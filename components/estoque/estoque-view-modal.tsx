@@ -61,39 +61,37 @@ export function ViewEstoqueModal({
       description="Preencha movimentações de estoque"
       isOpen={isOpen}
       onClose={onClose}
-      className="!max-w-full md:!max-w-[1000px] w-full h-full md:h-auto m-0 md:m-auto rounded-none md:rounded-lg"
+      className="!max-w-full md:!max-w-[1000px] w-full h-full md:h-auto m-0 md:m-auto rounded-none md:rounded-lg text-slate-900"
     >
-      <>
-        <DataTable
-          columns={estoqueMovimentacoesColumns}
-          data={estoqueMovimentacoes || []}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          isLoading={isLoading}
-          actionButtons={[
-            <Button key="new-product" onClick={() => setIsAddModalOpen(true)}>
-              Nova movimentação
-            </Button>,
-          ]}
-        />
+      <DataTable
+        columns={estoqueMovimentacoesColumns}
+        data={estoqueMovimentacoes || []}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        isLoading={isLoading}
+        actionButtons={[
+          <Button key="new-product" onClick={() => setIsAddModalOpen(true)}>
+            Nova movimentação
+          </Button>,
+        ]}
+      />
 
-        <AddEstoqueModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          produtoId={stock?.produto_id ?? ""}
-          nomeProduto={stock?.produtos?.nome ?? ""}
-        />
-        <EditEstoqueModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          stock={selectedEstoqueMovi}
-        />
-        <DeleteStocktDialog
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          productId={stockIdToDelete}
-        />
-      </>
+      <AddEstoqueModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        produtoId={stock?.produto_id ?? ""}
+        nomeProduto={stock?.produtos?.nome ?? ""}
+      />
+      <EditEstoqueModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        stock={selectedEstoqueMovi}
+      />
+      <DeleteStocktDialog
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        productId={stockIdToDelete}
+      />
     </BaseModal>
   );
 }
