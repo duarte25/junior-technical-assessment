@@ -11,6 +11,9 @@ Este documento detalha o processo de desenvolvimento, as escolhas arquiteturais 
 * Corrigi o endpoint para garantir o retorno correto do JSON.
 
 ### Implementações e Melhorias
+* **Criação automática de estoque:** Ao cadastrar um produto, o sistema cria automaticamente o registro de estoque vinculado a ele, iniciando com saldo **0**, garantindo que nenhum produto exista sem controle de estoque.
+* **SKU único:** O SKU do produto passou a ser **único**, impedindo a criação de produtos duplicados e garantindo consistência e rastreabilidade no sistema.
+* **Validação de saldo:** Não é permitida movimentação de saída com quantidade maior que o saldo disponível em estoque (ex: saldo 100 → saída 150 é bloqueada).
 * **Estoque:** Reconstruí do zero os repositórios e serviços de movimentação de estoque. Implementei a lógica onde o saldo do produto é atualizado atomicamente após cada movimentação (Input/Output).
 * **Atomicidade com Prisma Transactions:** Implementei o uso de `$transaction` em todas as operações de estoque necessarias. Isso garante que a criação do registro de movimentação e a atualização do saldo do produto ocorram como uma única unidade de trabalho, evitando inconsistências no banco de dados em caso de falhas parciais.
 * **Frontend:** Reativei as abas de estoque, criei modais de formulário com validação e melhorei a UX com feedback visual.
